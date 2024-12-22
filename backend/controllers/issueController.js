@@ -15,7 +15,7 @@ const getIssueById = (req, res) => {
   res.send("Issue Detailes Fetched!");
 };
 
-modules.exports = {
+module.exports = {
   createIssue,
   updateIssueById,
   deleteIssueById,
