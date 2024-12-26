@@ -1,14 +1,15 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ReturnDocument } = require("mongodb");
 const dotenv = require("dotenv");
+var ObjectId = require("mongodb").ObjectId;
 
 dotenv.config();
 const uri = process.env.MONGODB_URI;
 
 let client;
 
-// comom function for the connections
+// common function for the connections
 async function connectClient() {
   if (!client) {
     client = new MongoClient(uri, {
@@ -19,6 +20,11 @@ async function connectClient() {
   }
 }
 
+// == signup User ==
+// 1 establish connection
+// 2 create hash pass
+// 3 generate token
+// 4 save user
 async function signup(req, res) {
   const { username, password, email } = req.body;
   try {
@@ -57,25 +63,128 @@ async function signup(req, res) {
   }
 }
 
-const login = (req, res) => {
-  res.send("Logginf In ");
-};
+// == Login User ==
+// 1 connection established
+// 2 find user
+// validate the token or expand it
 
-const getAllUsers = (req, res) => {
-  res.send("all users fetched");
-};
+async function login(req, res) {
+  const { email, password } = req.body;
 
-const getUserProfile = (req, res) => {
-  res.send("profile fetched");
-};
+  try {
+    await connectClient();
+    const db = client.db("CodenestDb");
+    const userCollection = db.collection("users");
 
-const updateUserProfile = (req, res) => {
-  res.send("profile updated");
-};
+    const user = await userCollection.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
 
-const deleteUserProfile = (req, res) => {
-  res.send("profile deleted");
-};
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    res.json({ token, userId: user._id });
+  } catch (error) {
+    console.error("Error durign the login : ", error.message);
+    res.status(500).send("server error");
+  }
+}
+
+async function getAllUsers(req, res) {
+  try {
+    await connectClient();
+    const db = client.db("CodenestDb");
+    const userCollection = db.collection("users");
+
+    const users = await userCollection.find({}).toArray();
+    res.json(users);
+  } catch (error) {
+    console.error("Error durign the fetching : ", error.message);
+    res.status(500).send("server error");
+  }
+}
+
+async function getUserProfile(req, res) {
+  const currentID = req.params.id;
+  try {
+    await connectClient();
+    const db = client.db("CodenestDb");
+    const userCollection = db.collection("users");
+
+    const user = await userCollection.findOne({
+      _id: new ObjectId(currentID),
+    });
+    if (!user) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+    res.send(user);
+  } catch (error) {
+    console.error("Error durign the fetching user profile : ", error.message);
+    res.status(500).send("server error");
+  }
+}
+
+async function updateUserProfile(req, res) {
+  const currentID = req.params.id;
+  const { email, password } = req.body;
+
+  try {
+    let updateFields = { email };
+    await connectClient();
+    const db = client.db("CodenestDb");
+    const userCollection = db.collection("users");
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      updateFields.password = hashedPassword;
+    }
+    const result = await userCollection.findOneAndUpdate(
+      {
+        _id: new ObjectId(currentID),
+      },
+      { $set: updateFields },
+      { returnDocument: "after" }
+    );
+
+    if (!result.value) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+
+    res.send(result.value);
+  } catch (error) {
+    console.error("Error durign the fetching user profile : ", error.message);
+    res.status(500).send("server error");
+  }
+}
+
+async function deleteUserProfile(req, res) {
+  const currentID = req.params.id;
+
+  try {
+    await connectClient();
+    const db = client.db("CodenestDb");
+    const userCollection = db.collection("users");
+
+    const result = await userCollection.deleteOne({
+      _id: new ObjectId(currentID),
+    });
+    if (result.deleteCount == 0) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+
+    res.json({ message: "User Profile  Deleted" });
+  } catch (error) {
+    console.error("Error durign the fetching user profile : ", error.message);
+    res.status(500).send("server error");
+  }
+}
 
 module.exports = {
   getAllUsers,
