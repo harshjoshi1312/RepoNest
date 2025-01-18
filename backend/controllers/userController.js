@@ -56,7 +56,7 @@ async function signup(req, res) {
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1h" }
     );
-    res.json({ token });
+    res.json({ token, userId: result.insertedId });
   } catch (error) {
     console.error("error during signup :", error.message);
     res.status(500).send("server error");

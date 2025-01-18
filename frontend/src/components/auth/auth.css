@@ -1,0 +1,143 @@
+/* General Styling */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: "Asap", sans-serif;
+  background-color: #0c1116;
+  color: #f1f6fd;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Wrapper */
+.login-wrapper {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Logo */
+.login-logo-container {
+  margin-bottom: 20px;
+}
+
+.logo-login {
+  width: 50px;
+  height: auto;
+}
+
+/* Box Styles */
+.login-box-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.login-box {
+  background-color: #161a23;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.pass-box {
+  background-color: #0c1116;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #3d3d3d;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Form Input */
+.input {
+  width: 100%;
+  max-width: 300px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 5px;
+  border: 1px solid #3d3d3d;
+  background-color: #0c1116;
+  color: #f1f6fd;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input:focus,
+.input:hover {
+  border-color: #238636;
+  outline: none;
+  background-color: #11171f;
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #f1f6fd;
+}
+
+/* Buttons */
+.login-btn,
+.submit-btn {
+  width: 100%;
+  max-width: 300px;
+  height: 40px;
+  border-radius: 5px;
+  background-color: #238636;
+  color: #f1f6fd;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn:hover,
+.submit-btn:hover {
+  background-color: #2b9544;
+}
+
+/* Links */
+a {
+  color: #2b7df7;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #4994ff;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 400px) {
+  .login-box,
+  .pass-box {
+    padding: 20px;
+    width: 90%;
+  }
+
+  .input,
+  .login-btn,
+  .submit-btn {
+    max-width: 100%;
+  }
+}
